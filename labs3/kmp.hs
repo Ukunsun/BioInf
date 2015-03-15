@@ -4,24 +4,30 @@ import qualified Data.Vector.Mutable as VM
 import qualified Data.ByteString.Char8 as BS
  
 type PrefixTable = V.Vector Int
- 
+{-
+makePrefixTable (BS.pack "ABCABD")
+fromList [0,0,0,1,2,0]
+
+Долго разбирался
+-}
 makePrefixTable :: BS.ByteString -> PrefixTable
 makePrefixTable s =
   let n = BS.length s
+  --  create (do { v <- new 2; write v 0 'a'; write v 1 'b' }) = <a,b>
   in V.create $ do
     p <- VM.new n
-    VM.set p 0
+    VM.set p 0 -- установить в p значения всех элементов в 0
     let loop i k | i == n = return ()
+				 -- if k>0 && s[i] != s[k]
                  | k > 0 && (BS.index s i /= BS.index s k) = do
-                     nk <- VM.read p (k - 1)
+                     nk <- VM.read p (k - 1) -- nk = p[k-1]
                      loop i nk
                  | otherwise = do
                      let nk = if BS.index s i == BS.index s k
                               then k + 1
                               else k
-                     VM.write p i nk
-                     loop (i + 1) nk
- 
+                     VM.write p i nk -- записать в p на i-ю позицию значение nk
+                     loop (i + 1) nk 
     loop 1 0
     return p
  
