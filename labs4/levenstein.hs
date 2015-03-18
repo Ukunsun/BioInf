@@ -35,6 +35,7 @@ getLev "ABCDEFGH" "ACDEXGIH"
 -}
 ss1 = BS.pack "ABCDEFGH"
 ss2 = BS.pack "ACDEXGIH"
+
 getLev::String->String->Int
 getLev str1 str2 = V.last $V.last $ levenTbl (BS.pack str1) (BS.pack str2)
 
