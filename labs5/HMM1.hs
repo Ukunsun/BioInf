@@ -59,14 +59,17 @@ perh::(Eq hStateType,Eq stateType) => HMM stateType hStateType->stateType->hStat
 perh hmm y x = cost.head$get1to hmm y x
 -- get2to hmm y x; -- получили правило перехода из скрытого состояния x в y
 
+perh2 :: (Eq hStateType,Eq stateType) =>HMM stateType hStateType -> hStateType -> hStateType -> Float
+perh2 hmm y x = cost.head$get2to hmm y x
+
 perh3::(Eq hStateType,Eq stateType) => HMM stateType hStateType->hStateType->Float
 perh3 hmm x = cost.head$get3to hmm x
 
 perhs :: (Eq stateType, Ord hStateType) => HMM stateType hStateType -> [stateType] -> (Float, hStateType)
 perhs hmm (x:[]) = maximum $ map (\el -> ((perh hmm x el)* (perh3 hmm el),el)) (hstates hmm)
-perhs hmm (x:str) = maximum $ map (\el -> let (a,b) = (perhs hmm str) in((perh hmm x el)*a,el)) (hstates hmm)
+perhs hmm (x:str) = maximum $ map (\el -> let (a,b) = (perhs hmm str) in((perh hmm x el)*a*(perh2 hmm el b),el)) (hstates hmm)
 
-
+-- perhs0 hmm (x:[]) =  maximum $ map (\el -> ((perh hmm x el)* (perh3 hmm el),el)) (hstates hmm)
 {- tblHMM::HMM Char Char
 tblHMM = HMM states hstates fstate rules rules2 rules3 where
 		states = ['G','B','X']
