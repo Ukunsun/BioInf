@@ -13,6 +13,7 @@ tblHMM = HMM states hstates fstate rules rules2 rules3 where
 		rules = [ Rules 'H' 'X' 0.2
 				 ,Rules 'H' 'B' 0.1
 				 ,Rules 'H' 'G' 0.6
+				 
 				 ,Rules 'I' 'X' 0.1
 				 ,Rules 'I' 'B' 0.8
 				 ,Rules 'I' 'G' 0.1
@@ -21,7 +22,9 @@ tblHMM = HMM states hstates fstate rules rules2 rules3 where
 				 ,Rules '*' 'I' 0.5
 				 ]
 		rules2= [ Rules 'H' 'I' 0.1
+				 ,Rules 'H' 'H' 0.9
 				 ,Rules 'I' 'H' 0.9
+				 ,Rules 'I' 'I' 0.1
 				 ]
 
 hmm1 = tblHMM

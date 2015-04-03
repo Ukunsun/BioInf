@@ -57,7 +57,9 @@ get1to hmm tost fst = let
 -- x - скрытое состояние
 -- y - явное
 perh::(Eq hStateType,Eq stateType) => HMM stateType hStateType->stateType->hStateType->Float
-perh hmm y x = cost.head$get1to hmm y x
+perh hmm y x = let lst = get1to hmm y x in
+				if lst == [] then 1.0
+				else cost.head$ lst
 -- get2to hmm y x; -- получили правило перехода из скрытого состояния x в y
 
 perh2 :: (Eq hStateType,Eq stateType) =>HMM stateType hStateType -> hStateType -> hStateType -> Float
@@ -66,7 +68,9 @@ perh2 hmm y x = let lst = get2to hmm y x in
 				else cost.head$ lst
 
 perh3::(Eq hStateType,Eq stateType) => HMM stateType hStateType->hStateType->Float
-perh3 hmm x = cost.head$get3to hmm x
+perh3 hmm x =  let lst = get3to hmm x in
+				if lst == [] then 1.0
+				else cost.head$ lst
 
 perhs :: (Eq stateType, Ord hStateType) => HMM stateType hStateType -> [stateType] -> (Float, hStateType)
 perhs hmm (x:[]) = maximum $ map (\el -> ((perh hmm x el)* (perh3 hmm el),el)) (hstates hmm)
