@@ -1,9 +1,12 @@
 module HMM1(
-			HMM
-			,Rules
-			,get1to
-			,get2to
-			,get3to
+			 Rules(..)
+			,HMM(..)
+			,get1to		-- вернуть правило из rules,  которое ведёт В указанное состояние ИЗ указанного
+			,get2to		-- вернуть правило из rules2, которое ведёт В указанное состояние ИЗ указанного
+			,get3to		-- вернуть правило из rules3, которое ведёт В указанное состояние
+			,perh		-- вернуть вероятность перехода В указанное ИЗ указаннного состояния по таблице правил rules
+			,perh3		-- вернуть вероятность перехода В указанное ИЗ указаннного состояния по таблице правил rules3
+			,perhs
 			)
 where
 
@@ -34,7 +37,7 @@ get3to hmm hst = let
 							 else f rs s
 			in f (rules3 hmm) hst
 
-get2to::Eq hStateType => HMM hStateType hStateType->hStateType->hStateType->[Rules hStateType hStateType]
+get2to::Eq hStateType => HMM stateType hStateType->hStateType->hStateType->[Rules hStateType hStateType]
 get2to hmm tost fromst = let 
 				-- f::[Rules hStateType hStateType]->hStateType->hStateType->Rules hStateType hStateType
 				f [] _  _ = []
@@ -52,18 +55,19 @@ get1to hmm tost fst = let
 			
 -- x - скрытое состояние
 -- y - явное
-perh::HMM Char Char -> Char -> Char -> Float
+perh::(Eq hStateType,Eq stateType) => HMM stateType hStateType->stateType->hStateType->Float
 perh hmm y x = cost.head$get1to hmm y x
-
-perh3::HMM Char Char -> Char -> Float
-perh3 hmm x = cost.head$get3to hmm x
 -- get2to hmm y x; -- получили правило перехода из скрытого состояния x в y
 
+perh3::(Eq hStateType,Eq stateType) => HMM stateType hStateType->hStateType->Float
+perh3 hmm x = cost.head$get3to hmm x
+
+perhs :: (Eq stateType, Ord hStateType) => HMM stateType hStateType -> [stateType] -> (Float, hStateType)
 perhs hmm (x:[]) = maximum $ map (\el -> ((perh hmm x el)* (perh3 hmm el),el)) (hstates hmm)
 perhs hmm (x:str) = maximum $ map (\el -> let (a,b) = (perhs hmm str) in((perh hmm x el)*a,el)) (hstates hmm)
 
 
-tblHMM::HMM Char Char
+{- tblHMM::HMM Char Char
 tblHMM = HMM states hstates fstate rules rules2 rules3 where
 		states = ['G','B','X']
 		hstates = ['H','I']
@@ -85,4 +89,4 @@ tblHMM = HMM states hstates fstate rules rules2 rules3 where
 hmm1 = tblHMM
 -- lab5 hmm1 "GGXB"
 -- [(0.3,'H'),(0.18,'H'),(3.6000002e-2,'H'),(2.8800001e-2,'I')]
-lab5 hmm str = reverse$map (\x -> perhs hmm x) (init$tails$reverse str)
+lab5 hmm str = reverse$map (\x -> perhs hmm x) (init$tails$reverse str) -}

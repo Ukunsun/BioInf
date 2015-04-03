@@ -23,22 +23,9 @@ tblHMM = HMM states hstates fstate rules rules2 rules3 where
 		rules2= [ Rules 'H' 'I' 0.1
 				 ,Rules 'I' 'H' 0.9
 				 ]
-		
 
--- нифига, недо выводить в IO :(
-makeDatas::Int->HMM Char Char->[Char]->[Char]
-makeDatas 0  _  res = res
-makeDatas i tbl res = makeDatas (i-1) tbl res2
-				where
-				res2 = []
-
-viterbi::HMM Char Char->[Char]->[Char]->[Char]
-viterbi _ [] res = res
-viterbi hmm (x:ended) res = viterbi hmm ended res2 where
-			-- p hmm ch fst
-			res2 = []
-			
--- f::HMM Char Char->Char->(Char,Float)->Float
--- f hmm ch (hch,pi_1) = (get1to hmm ch)*pi_1*
-
+hmm1 = tblHMM
+-- lab5 hmm1 "GGXB"
+-- [(0.3,'H'),(0.18,'H'),(3.6000002e-2,'H'),(2.8800001e-2,'I')]
+lab5 hmm str = reverse$map (\x -> perhs hmm x) (init$tails$reverse str)
 
