@@ -12,12 +12,12 @@ getEl::(Char,Char)->(Matr,String)->Int
 getEl (ch1,ch2) (matr,str) = let
 				i = head $findIndices (==ch1) str;
 				j = head $findIndices (==ch2) str
-			in (!) matr (i,j) where
+			in (!) matr (i+1,j+1)
 
 affineGap::String->String->Int->Int->(Matr,[Char])->Matr
 affineGap str1 str2 wg ws blosum= let
-				m = length str1;
-				n = length str2;
+				m = length str1 +1;
+				n = length str2 +1;
 				firstWork::Int->[Matr]->[Matr]
 				firstWork i res@[a,b] | i>m = res
 						 |otherwise = let
@@ -34,7 +34,7 @@ affineGap str1 str2 wg ws blosum= let
 							-- | i==3 && j>3 = res
 							|j>n = mainWork (i+1) 2 res
 							| otherwise = let
-									nums = (str1!!(i-1),str2!!(j-1));
+									nums = (str1!!(i-2),str2!!(j-2));
 									vi1j1 = (!)v_ (i-1,j-1);
 									gEl = vi1j1+(getEl nums blosum);
 									_g = setElem gEl (i,j) g_;
@@ -135,8 +135,8 @@ main=do
 	let matr = map (\x -> (map (\y-> read y::Int)(split " " $drop 2 x))) (tail matrBL)
 	let len = length matr
 	let blosum = (fromList len len (concat matr), str)
-	let str1 = "PRTEINS"
-	let str2 = "PRTWPSEIN"
+	let str1 = "PRTEINSG"
+	let str2 = "PRTWPSEINC"
 	-- let str1 = "GAATTCAGTTA"
 	-- let str2 = "GGATCGA"
 	
