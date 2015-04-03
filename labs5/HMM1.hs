@@ -5,6 +5,7 @@ module HMM1(
 			,get2to		-- вернуть правило из rules2, которое ведёт В указанное состояние ИЗ указанного
 			,get3to		-- вернуть правило из rules3, которое ведёт В указанное состояние
 			,perh		-- вернуть вероятность перехода В указанное ИЗ указаннного состояния по таблице правил rules
+			,perh2
 			,perh3		-- вернуть вероятность перехода В указанное ИЗ указаннного состояния по таблице правил rules3
 			,perhs
 			)
@@ -60,14 +61,20 @@ perh hmm y x = cost.head$get1to hmm y x
 -- get2to hmm y x; -- получили правило перехода из скрытого состояния x в y
 
 perh2 :: (Eq hStateType,Eq stateType) =>HMM stateType hStateType -> hStateType -> hStateType -> Float
-perh2 hmm y x = cost.head$get2to hmm y x
+perh2 hmm y x = let lst = get2to hmm y x in
+				if lst == [] then 1.0
+				else cost.head$ lst
 
 perh3::(Eq hStateType,Eq stateType) => HMM stateType hStateType->hStateType->Float
 perh3 hmm x = cost.head$get3to hmm x
 
 perhs :: (Eq stateType, Ord hStateType) => HMM stateType hStateType -> [stateType] -> (Float, hStateType)
 perhs hmm (x:[]) = maximum $ map (\el -> ((perh hmm x el)* (perh3 hmm el),el)) (hstates hmm)
-perhs hmm (x:str) = maximum $ map (\el -> let (a,b) = (perhs hmm str) in((perh hmm x el)*a*(perh2 hmm el b),el)) (hstates hmm)
+perhs hmm (x:str) = maximum $ map (\el -> let 
+									(a,b) = (perhs hmm str);
+									pb2el = (perh2 hmm el b);
+									res = (perh hmm x el)*pb2el*a;
+									in(res,el)) (hstates hmm)
 
 -- perhs0 hmm (x:[]) =  maximum $ map (\el -> ((perh hmm x el)* (perh3 hmm el),el)) (hstates hmm)
 {- tblHMM::HMM Char Char
