@@ -46,6 +46,14 @@ levenTbl::BS.ByteString->BS.ByteString->LevTable
 levenTbl str1 str2 = levTbl 0 str1 str2 res where
 			res = V.fromList[]
 
+{- levenTbl2::String->String->LevTable
+levenTbl2 str1 str2 = let
+			str1_ = ;
+			str2_ = ;
+			res = V.fromList[]	
+		in levTbl 0 str1_ str2_ res -}
+					
+-- построение таблицы
 levTbl::Int->BS.ByteString->BS.ByteString->LevTable->LevTable
 levTbl ii str1 str2 res = let
 			m = BS.length str1; -- j
@@ -54,7 +62,7 @@ levTbl ii str1 str2 res = let
 			levTbl_ i j_ = V.create $do
 						p <- VM.new m
 						VM.set p 0
-						let loop j | j == m = return ()
+						let loop j | j >= m = return ()
 								-- | (j == 0 && i==0) = do
 								--	VM.write p 0 0
 								--		loop (j+1) 
