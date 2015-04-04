@@ -1,7 +1,10 @@
 module Lab5(
+			 lab5
+			,tblHMM
 			)
 where
-
+-- https://github.com/Ukunsun/BioInf/tree/master/labs5
+-- https://izbicki.me/blog/using-hmms-in-haskell-for-bioinformatics.html
 import HMM1
 import Data.List 
 
@@ -21,8 +24,8 @@ tblHMM = HMM states hstates fstate rules rules2 rules3 where
 		rules3= [ Rules '*' 'H' 0.5
 				 ,Rules '*' 'I' 0.5
 				 ]
-		rules2= [ Rules 'H' 'I' 0.1
-				 ,Rules 'H' 'H' 0.9
+		rules2= [ Rules 'H' 'I' 0.5
+				 ,Rules 'H' 'H' 0.5
 				 ,Rules 'I' 'H' 0.9
 				 ,Rules 'I' 'I' 0.1
 				 ]
