@@ -105,15 +105,15 @@ canConc2 lst1 lst2 = (b, num, max len1 len2) where
 		num = if len1>len2 then 0 else 1
 		-- num = if len1>len2 then 1 else 2
 
-canConc::[PartDB]->PartDB->(Bool,Int,Int)
+-- можно ли добавить в путь ещё одну k-меру?
+-- Bool - можно или нет
+canConc::[PartDB]->PartDB->Bool -- ,Int,Int)
 canConc g1 g = let
 			g1To = stateTo $last g1;
 			gTo = stateTo g;
 			g1From= stateFrom $head g1;
 			gFrom = stateFrom g;
-		in if(g1To==gFrom) then (True,0,0)
-		else if(gTo==g1From)then(True,1,0)
-		else (False,0,0)
+		in (g1To==gFrom)||(gTo==g1From)
 -- 
 whichThreads::(Eq a)=>[a]->[[a]]->[(Bool,Int,Int)]
 whichThreads lst lsts = map (\x -> canConc2 lst x) lsts
@@ -122,9 +122,9 @@ whichThreads lst lsts = map (\x -> canConc2 lst x) lsts
 -- findWay::[PartDB]->[PartDB]->[PartDB]
 findWay way lstAllEls = let
 			lstBII = map (\x -> canConc way x) lstAllEls;
-			lstB_ = filter (\(x,y,z)-> x == True) lstBII;
-			lst = map (\x -> lstAllEls !! x)(findIndices (\(x,y,z)-> x==True) lstB_);
-			in if lstB_ == [] then way
+			-- lstB_ = filter (== True) lstBII;
+			lst = map (\x -> lstAllEls !! x)(findIndices (==True) lstBII);
+			in if lst == [] then way
 			else maximumBy (compare `on` length) (map (\x-> (findWay (conc3 way x) (delete x lstAllEls))) lst)
 
 -- let bruj = makeKmer ["accgt","cgtaaa","agtcc"] 3
@@ -134,7 +134,7 @@ findWay way lstAllEls = let
 --- казалось бы 
 --- "accgtaaagtcc"
 --- НО НЕТ 
---- "gtccgtaaa"
+--- "agtccgtaaa"
 lab6 str k = let
 		bruj = makeKmer str k;
 	in maximumBy (compare `on` length) (map (\x -> findWay [x] (delete x bruj)) bruj)
