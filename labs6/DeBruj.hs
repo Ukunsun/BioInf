@@ -68,6 +68,15 @@ conc2 g1 g2 = let
 				then concat [g1,drop len12 g2]
 				else concat [g2,drop len21 g1]
 
+conc22::[PartDB]->[PartDB]->[PartDB]
+conc22 g1 g2 = let
+		len12 = giveNumOfEq g1 g2;
+		len21 = giveNumOfEq g2 g1;
+			in if (len12==0 && len21 == 0) then g1
+			else if(len12>len21)
+				then concat [g1,drop len12 g2]
+				else concat [g2,drop len21 g1]
+				
 conc3::[PartDB]->PartDB->[PartDB]
 conc3 g1 g = let
 			g1To = stateTo $last g1;
@@ -79,7 +88,7 @@ conc3 g1 g = let
 		else g1
 -- ищем количество совпадающих последовательностей
 giveNumOfEq::(Eq a)=>[a]->[a]->Int
-giveNumOfEq lst1 lst2 = giveNumOfEq_ lst1 lst2 0
+giveNumOfEq lst1 lst2 = giveNumOfEq_ (reverse lst1) lst2 0
 
 giveNumOfEq_::(Eq a)=>[a]->[a]->Int->Int
 giveNumOfEq_ [] _ res = res
@@ -91,6 +100,7 @@ giveNumOfEq_ (x:lst1) (y:lst2) res = if (x==y)
 makeKmer::[String]->Int->[PartDB]
 makeKmer strs k = let
 		brujs = union []$ concat $map (\x-> deBr x k) strs
+		-- brujs = concat $map (\x-> deBr x k) strs
 		in brujs
 		
 -- можно ли соединить эти две последовательности
@@ -114,6 +124,18 @@ canConc g1 g = let
 			g1From= stateFrom $head g1;
 			gFrom = stateFrom g;
 		in (g1To==gFrom)||(gTo==g1From)
+
+-- можно ли соединить эти две последовательности
+-- если можно, то b = True
+-- можно, но как? сначала 1 или сначала вторая?
+--
+canConc3::(Eq a)=>[a]->[a]->Bool
+canConc3 lst1 lst2 = or [len1>0, len2>0] where
+		len1 = giveNumOfEq lst1 lst2
+		len2 = giveNumOfEq lst2 lst1
+
+
+		
 -- 
 whichThreads::(Eq a)=>[a]->[[a]]->[(Bool,Int,Int)]
 whichThreads lst lsts = map (\x -> canConc2 lst x) lsts
@@ -128,7 +150,7 @@ findWay way lstAllEls = let
 			else maximumBy (compare `on` length) (map (\x-> (findWay (conc3 way x) (delete x lstAllEls))) lst)
 
 -- let bruj = makeKmer ["accgt","cgtaaa","agtcc"] 3
--- let x = lab6 ["accgt","cgtaaa","agtcc"] 3			
+-- let x = lab6 ["accgt","cgtaaa","agtcc"] 3
 -- lab6::[String]->Int->[PartDB]
 --- deBrToStr $ lab6 ["accgt","cgtaaa","agtcc"] 3
 --- казалось бы 
@@ -140,9 +162,23 @@ lab6 str k = let
 	in maximumBy (compare `on` length) (map (\x -> findWay [x] (delete x bruj)) bruj)
 	-- in findWay [bruj!!0] (tail bruj)
 	-- in findWay [bruj!!6] (delete (bruj!!6) bruj)
-			
-			
-			
-			
+makeKmers::[String]->Int->[[PartDB]]->[[PartDB]]
+makeKmers [] _ res = res
+makeKmers (el:strs) k_ res = makeKmers strs k_ (res++[makeKmer [el] k_])			
+
+
+findWay2 way lstAllEls = let
+			lstBII = map (\x -> canConc3 way x) lstAllEls;
+			-- lstB_ = filter (== True) lstBII;
+			lst = map (\x -> lstAllEls !! x)(findIndices (==True) lstBII);
+			in if lst == [] then way
+			else maximumBy (compare `on` length) (map (\x-> (findWay2 (conc2 way x) (delete x lstAllEls))) lst)
+
+-- deBrToStr $ lab6v2 ["accgt","cgtaaa","aaagtcc"] 3
+-- "accgtaaagtcc"
+-- и все довольны
+lab6v2 str k = let
+			bruj = makeKmers str k [];
+		in	maximumBy (compare `on` length) (map (\x -> findWay2 x (delete x bruj)) bruj)
 			
 			
