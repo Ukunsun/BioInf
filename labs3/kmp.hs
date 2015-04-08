@@ -30,7 +30,10 @@ makePrefixTable s =
                      loop (i + 1) nk 
     loop 1 0
     return p
- 
+	
+fukmp::String->String->Int
+fukmp str str2 = indexOf (BS.pack str) (BS.pack str2)
+	
 indexOf :: BS.ByteString -> BS.ByteString -> Int
 indexOf needle haystack =
   let pt    = makePrefixTable needle
